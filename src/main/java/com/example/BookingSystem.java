@@ -5,8 +5,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BookingSystem {
+
+
     private final TimeProvider timeProvider;
+
     private final RoomRepository roomRepository;
+
     private final NotificationService notificationService;
 
     public BookingSystem(TimeProvider timeProvider,

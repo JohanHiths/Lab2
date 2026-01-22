@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.example</groupId>
-    <artifactId>jdbc</artifactId>
+    <groupId>org.example</groupId>
+    <artifactId>JavaJPA</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -13,15 +13,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.jupiter.version>6.0.1</junit.jupiter.version>
         <assertj.core.version>3.27.6</assertj.core.version>
-        <mockito.version>5.20.0</mockito.version>
+        <mockito.version>5.21.0</mockito.version>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>9.5.0</version>
-            <scope>runtime</scope>
-        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -41,33 +35,35 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>1.21.3</version>
-            <scope>test</scope>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>7.2.0.Final</version>
         </dependency>
         <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>mysql</artifactId>
-            <version>1.21.3</version>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>9.5.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>4.8.184</version>
         </dependency>
     </dependencies>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.5.4</version>
-                <executions>
-                    <execution>
-                        <id>integration-test</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
+                <configuration>
+                    <argLine>
+                        -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+                    </argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>
+
 </project>
