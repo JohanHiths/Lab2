@@ -2,13 +2,12 @@ package com.example;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Timer;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -42,7 +41,7 @@ class BookingSystemTest {
 
 
     @Test
-    void should_throwException_when_bookingIsEmpty(){
+    void should_throwException_when_bookingIsEmpty() {
         assertThatThrownBy(() -> of("", ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Booking cannot be null or empty");
@@ -50,25 +49,55 @@ class BookingSystemTest {
 
 
     @Test
-    void endNotBeforeStart() {
-
-        LocalDateTime start = LocalDateTime.now().plusDays(1);
-        LocalDateTime end = LocalDateTime.now();
-
-        assertThat(end).isAfter(start);
-    }
-
-    @Test
+    @DisplayName("Ska kunna boka tillgängliga rum")
     void getAvailableRooms() {
+        Room room = new Room("1", "Rum 1");
 
+        List<Room> rooms = new ArrayList<>();
+
+        boolean result = rooms.add(room);
+
+        assertThat(result).isTrue();
+        assertThat(room.isAvailable(start, end)).isTrue();
+
+
+    }
+    @Test
+    @DisplayName("Ingen Dubbel Bokning")
+    void should_not_allow_double_booking_for_overlapping_times() {
+        Room roomA = new Room("RoomA", "Rum 1");
+
+        LocalDateTime bookedSlot = LocalDateTime.of(2026, 1, 20, 10, 0);
+        LocalDateTime bookedSlot2 = LocalDateTime.of(2026, 1, 20, 11, 0);
+
+
+        roomA.addBooking(new Booking("1", "1", start, end));
+        roomA.addBooking(new Booking("2", "1", start, end));
+
+        assertThat(roomA.isAvailable(start, end)).isFalse();
     }
 
     @Test
+    @DisplayName("Ska kunna avboka")
     void cancelBooking() {
+        Room room = new Room("1", "Rum 1");
+        room.addBooking(new Booking("1", "1", start, end));
 
+        assertThat(room.hasBooking("1")).isTrue();
+        room.removeBooking("1");
+        assertThat(room.hasBooking("1")).isFalse();
+
+    }
+    @Test
+    void canABookingStartAtTheSameTimeAsWhenABookingEnds(){
+        BookingSystem system = new BookingSystem(timeProvider, roomRepository, notificationService);
+        LocalDateTime start = LocalDateTime.of(2026, 1, 20, 10, 0);
+        LocalDateTime end = LocalDateTime.of(2026, 1, 20, 10, 0);
+
+
+        String roomId = "Rum 1";
+    }
 
     }
 
 
-
-}
