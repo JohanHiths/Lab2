@@ -21,7 +21,7 @@ class BookingSystemTest {
     private final RoomRepository roomRepository = mock(RoomRepository.class);
     private final TimeProvider timeProvider = mock(TimeProvider.class);
     private final NotificationService notificationService = mock(NotificationService.class);
-
+    //
     @Test
     @DisplayName("Ska boka ett rum när det är tillgängligt")
     void shouldSuccessfullyBookARoomWhenItIsAvailable() {
