@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Timer;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Named.of;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 class BookingSystemTest {
@@ -30,6 +32,10 @@ class BookingSystemTest {
         LocalDateTime start = LocalDateTime.of(2026, 1, 20, 10, 0);
         LocalDateTime end = start.plusHours(2);
         String roomId = "Rum 1";
+        Room room = new Room(roomId, "Rum 1");
+        when(timeProvider.getCurrentTime()).thenReturn(start.minusMinutes(1));
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+        when(roomRepository.findAll()).thenReturn(List.of(room));
 
         // 2 Act
         boolean result = system.bookRoom(roomId, start, end);
@@ -42,9 +48,10 @@ class BookingSystemTest {
 
     @Test
     void should_throwException_when_bookingIsEmpty() {
-        assertThatThrownBy(() -> of("", ""))
+        BookingSystem system = new BookingSystem(timeProvider, roomRepository, notificationService);
+        assertThatThrownBy(() -> system.bookRoom(null, null, null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Booking cannot be null or empty");
+                .hasMessage("Bokning kräver giltiga start- och sluttider samt rum-id");
     }
 
 
