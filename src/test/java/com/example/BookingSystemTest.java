@@ -99,7 +99,7 @@ class BookingSystemTest {
 
         assertThat(roomA.isAvailable(start, end)).isFalse();
     }
-
+//
     @Test
     @DisplayName("Ska kunna avboka")
     void cancelBooking() throws NotificationException {
