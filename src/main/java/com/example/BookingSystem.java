@@ -8,9 +8,7 @@ public class BookingSystem {
 
 
     private final TimeProvider timeProvider;
-
     private final RoomRepository roomRepository;
-
     private final NotificationService notificationService;
 
     public BookingSystem(TimeProvider timeProvider,
@@ -94,11 +92,10 @@ public class BookingSystem {
         try {
             notificationService.sendCancellationConfirmation(booking);
         } catch (NotificationException e) {
-            // Fortsätt även om notifieringen misslyckas
+
         }
 
         return true;
     }
 }
 
-// Stödklasser och interface som behövs:

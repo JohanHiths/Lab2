@@ -1,5 +1,7 @@
 package com.example;
 
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,16 +20,30 @@ import static org.mockito.Mockito.when;
 
 
 class BookingSystemTest {
-    private final LocalDateTime start = LocalDateTime.now();
-    private final LocalDateTime end = LocalDateTime.now();
+
+    private BookingSystem bookingSystem;
     private final RoomRepository roomRepository = mock(RoomRepository.class);
     private final TimeProvider timeProvider = mock(TimeProvider.class);
     private final NotificationService notificationService = mock(NotificationService.class);
-    //
+    LocalDateTime start = LocalDateTime.of(2026, 1, 20, 10, 0);
+    LocalDateTime end = start.plusHours(1);
+
+
+    @BeforeEach
+    public void setup(){
+        BookingSystem bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
+        bookingSystem.bookRoom("1", start, end);
+         RoomRepository roomRepository = mock(RoomRepository.class);
+         TimeProvider timeProvider = mock(TimeProvider.class);
+         NotificationService notificationService = mock(NotificationService.class);
+
+
+    }
+
     @Test
     @DisplayName("Ska boka ett rum när det är tillgängligt")
     void shouldSuccessfullyBookARoomWhenItIsAvailable() {
-        // Arrange
+
         BookingSystem system = new BookingSystem(timeProvider, roomRepository, notificationService);
         LocalDateTime start = LocalDateTime.of(2026, 1, 20, 10, 0);
         LocalDateTime end = start.plusHours(2);
@@ -37,10 +53,10 @@ class BookingSystemTest {
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
         when(roomRepository.findAll()).thenReturn(List.of(room));
 
-        // 2 Act
+
         boolean result = system.bookRoom(roomId, start, end);
 
-        // 3 Assert
+
         assertThat(result).isTrue();
         assertThat(system.getAvailableRooms(start, end)).isEqualTo(1);
     }
@@ -86,25 +102,27 @@ class BookingSystemTest {
 
     @Test
     @DisplayName("Ska kunna avboka")
-    void cancelBooking() {
-        Room room = new Room("1", "Rum 1");
-        room.addBooking(new Booking("1", "1", start, end));
-
-        assertThat(room.hasBooking("1")).isTrue();
-        room.removeBooking("1");
-        assertThat(room.hasBooking("1")).isFalse();
-
-    }
-    @Test
-    void canABookingStartAtTheSameTimeAsWhenABookingEnds(){
-        BookingSystem system = new BookingSystem(timeProvider, roomRepository, notificationService);
+    void cancelBooking() throws NotificationException {
         LocalDateTime start = LocalDateTime.of(2026, 1, 20, 10, 0);
-        LocalDateTime end = LocalDateTime.of(2026, 1, 20, 10, 0);
+        LocalDateTime end = start.plusHours(1);
+
+        Room room = new Room("1", "Rum 1");
+        Booking booking = new Booking("B1", "1", start, end);
+        String bookingId = "B1";
+
+        room.addBooking(booking);
+
+        roomRepository.findAll();
+
+        cancelBooking();
 
 
-        String roomId = "Rum 1";
+        assertThat(room.hasBooking(booking.getId())).isFalse();
+        roomRepository.save(room);
+        notificationService.sendBookingConfirmation(booking);
+
     }
 
-    }
 
+}
 
