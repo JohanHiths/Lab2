@@ -1,5 +1,6 @@
 package com.example.payment;
 
+//
 public final class SqlPaymentRepository implements PaymentRepository {
     private final DatabaseConnection databaseConnection;
 
