@@ -1,5 +1,6 @@
 package com.example;
 
+import net.bytebuddy.asm.Advice;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +13,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Timer;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Named.of;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -34,31 +37,39 @@ class BookingSystemTest {
         BookingSystem bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
         bookingSystem.bookRoom("1", start, end);
          RoomRepository roomRepository = mock(RoomRepository.class);
+
          TimeProvider timeProvider = mock(TimeProvider.class);
          NotificationService notificationService = mock(NotificationService.class);
-
-
     }
+
 
     @Test
     @DisplayName("Ska boka ett rum när det är tillgängligt")
     void shouldSuccessfullyBookARoomWhenItIsAvailable() {
-
         BookingSystem system = new BookingSystem(timeProvider, roomRepository, notificationService);
+
         LocalDateTime start = LocalDateTime.of(2026, 1, 20, 10, 0);
         LocalDateTime end = start.plusHours(2);
         String roomId = "Rum 1";
         Room room = new Room(roomId, "Rum 1");
+
         when(timeProvider.getCurrentTime()).thenReturn(start.minusMinutes(1));
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
         when(roomRepository.findAll()).thenReturn(List.of(room));
 
+        assertThat(system.getAvailableRooms(start, end)).hasSize(1);
 
         boolean result = system.bookRoom(roomId, start, end);
 
-
         assertThat(result).isTrue();
-        assertThat(system.getAvailableRooms(start, end)).isEqualTo(1);
+        assertThat(system.getAvailableRooms(start, end)).hasSize(0);
+    }
+
+    @Test
+    @DisplayName("Ska inte kunna boka ett rum när det är otillgängligt")
+    void shouldUnSuccessfullyBookARoomWhenItIsNotAvailable(){
+
+
     }
 
 

@@ -1,18 +1,23 @@
 package com.example.payment;
 
-import java.sql.SQLException;
-import java.util.Calendar;
-
 public class PaymentProcessor {
-    private static final String API_KEY = "sk_test_123456";
-    private final PaymentService paymentService;
-    private EmailService DatabaseConnection;
+    private PaymentRepository paymentRepository;
+    private EmailService emailService;
+    private PaymentGateway paymentGateway;
 
-    PaymentProcessor(PaymentService paymentService) {
-        this.paymentService = paymentService;
+
+    public PaymentProcessor(EmailService emailService, PaymentRepository paymentRepository, String API_KEY, PaymentGateway paymentGateway) {
+
+        this.emailService = emailService;
+        this.paymentRepository = paymentRepository;
+        this.paymentGateway = paymentGateway;
+
+
+
     }
 
-    public boolean processPayment(double amount) throws SQLException {
+
+    public boolean processPayment(double amount) {
         // Anropar extern betaltjänst direkt med statisk API-nyckel
         PaymentApiResponse response = PaymentApi.charge(API_KEY, amount);
 
