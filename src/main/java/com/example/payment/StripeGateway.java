@@ -1,5 +1,5 @@
 package com.example.payment;
-
+//
 public class StripeGateway implements PaymentGateway{
     private final String apiKey;
     public StripeGateway(String apiKey) {

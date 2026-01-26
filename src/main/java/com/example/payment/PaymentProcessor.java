@@ -17,7 +17,7 @@ public class PaymentProcessor {
         this.paymentGateway = paymentGateway;
         this.paymentRepository = paymentRepository;
         this.emailService = emailService;
-    }
+    }//
 
     public boolean processPayment(double amount) throws SQLException {
         // Anropar extern betaltjänst direkt med statisk API-nyckel
