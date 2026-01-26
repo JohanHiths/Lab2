@@ -123,16 +123,17 @@ class BookingSystemTest {
 
         room.addBooking(booking);
 
-        roomRepository.findAll();
+        BookingSystem system = new BookingSystem(timeProvider, roomRepository, notificationService);
+        when(timeProvider.getCurrentTime()).thenReturn(start.minusMinutes(1));
+        when(roomRepository.findAll()).thenReturn(List.of(room));
 
-        cancelBooking();
-
-
+        boolean result = system.cancelBooking(bookingId);
+        assertThat(result).isTrue();
         assertThat(room.hasBooking(booking.getId())).isFalse();
-        roomRepository.save(room);
-        notificationService.sendBookingConfirmation(booking);
 
     }
+
+
 
 
 }
