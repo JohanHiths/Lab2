@@ -1,7 +1,8 @@
 package com.example;
 
 import net.bytebuddy.asm.Advice;
-import org.junit.Before;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,12 +35,7 @@ class BookingSystemTest {
 
     @BeforeEach
     public void setup(){
-        BookingSystem bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
-        bookingSystem.bookRoom("1", start, end);
-         RoomRepository roomRepository = mock(RoomRepository.class);
-
-         TimeProvider timeProvider = mock(TimeProvider.class);
-         NotificationService notificationService = mock(NotificationService.class);
+        bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
     }
 
 
@@ -74,6 +70,7 @@ class BookingSystemTest {
 
 
     @Test
+    @DisplayName("Ska göra en exception när booking är tom")
     void should_throwException_when_bookingIsEmpty() {
         BookingSystem system = new BookingSystem(timeProvider, roomRepository, notificationService);
         assertThatThrownBy(() -> system.bookRoom(null, null, null))
