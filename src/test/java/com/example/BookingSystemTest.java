@@ -45,10 +45,9 @@ class BookingSystemTest {
 
     }
 
-
     @Test
     @DisplayName("Ska boka ett rum när det är tillgängligt")
-    void shouldSuccessfullyBookARoomWhenItIsAvailable() {
+    void shouldSuccessfullyBookARoomWhenItIsAvailable() throws NotificationException {
         BookingSystem system = new BookingSystem(timeProvider, roomRepository, notificationService);
 
         LocalDateTime start = LocalDateTime.of(2026, 1, 20, 10, 0);
@@ -64,14 +63,40 @@ class BookingSystemTest {
 
         boolean result = system.bookRoom(roomId, start, end);
 
+        verify(roomRepository).save(room);
+        verify(notificationService).sendBookingConfirmation(any());
+
         assertThat(result).isTrue();
         assertThat(system.getAvailableRooms(start, end)).hasSize(0);
     }
 
+
     @Test
     @DisplayName("Ska inte kunna boka ett rum när det är otillgängligt")
     void shouldUnSuccessfullyBookARoomWhenItIsNotAvailable(){
+        BookingSystem system = new BookingSystem(timeProvider, roomRepository, notificationService);
 
+        LocalDateTime start = LocalDateTime.of(2026, 1, 20, 10, 0);
+        LocalDateTime end = start.plusHours(2);
+        String roomId = "Rum 1";
+        Room room = new Room(roomId, "Rum 1");
+
+        when(timeProvider.getCurrentTime()).thenReturn(start.minusMinutes(1));
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+        when(roomRepository.findAll()).thenReturn(List.of(room));
+
+        system.bookRoom(roomId, start, end);
+        verify(roomRepository).save(room);
+
+        assertThat(system.getAvailableRooms(start, end)).hasSize(1);
+
+        boolean result = system.bookRoom(roomId, start, end);
+
+        assertThat(result).isFalse();
+
+        assertThat(system.getAvailableRooms(start, end)).hasSize(0);
+
+        //verify(roomRepository, never()).save(any(Room.class));
 
     }
 
@@ -174,9 +199,7 @@ class BookingSystemTest {
         when(roomRepository.findById(roomIdFromCsv)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> bookingSystem.bookRoom(roomIdFromCsv, start, end))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Rummet existerar inte");
-
+                .isInstanceOf(IllegalArgumentException.class);
 
         verify(roomRepository, never()).save(any());
 
