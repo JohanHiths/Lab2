@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +38,7 @@ class PaymentProcessorTest {
     void shouldProcessPaymentWhenGatewaySucceeds() throws SQLException {
         double amount = 199.0;
 
-        when(paymentGateway.charge(amount)).thenReturn(paymentApiResponse);
+        when(paymentGateway.charge(BigDecimal.valueOf(amount))).thenReturn(paymentApiResponse);
         when(paymentApiResponse.isSuccess()).thenReturn(true);
 
         boolean result = paymentProcessor.processPayment(amount);
@@ -52,7 +53,7 @@ class PaymentProcessorTest {
     void shouldNotProcessPaymentWhenGatewayFails() throws SQLException {
         double amount = 49.0;
 
-        when(paymentGateway.charge(amount)).thenReturn(paymentApiResponse);
+        when(paymentGateway.charge(BigDecimal.valueOf(amount))).thenReturn(paymentApiResponse);
         when(paymentApiResponse.isSuccess()).thenReturn(false);
 
         boolean result = paymentProcessor.processPayment(amount);

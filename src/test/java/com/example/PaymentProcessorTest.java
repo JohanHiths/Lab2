@@ -9,13 +9,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,12 +67,19 @@ class PaymentProcessorTest {
         Assertions.assertThat(result).isTrue();
 
        // verify
-        verify(paymentGateway).charge(amount);
+        verify(paymentGateway).charge(BigDecimal.valueOf(amount));
         verify(paymentRepository).saveSuccessfulPayment(amount);
         verify(emailService).sendPaymentConfirmation("user@example.com", amount);
 
         // extra
         verifyNoMoreInteractions(paymentGateway, paymentRepository, emailService);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-1.0, 0.0, })
+    void processPayment_fail_savesAndSendsEmail(double amount) {
+
+
     }
 
 

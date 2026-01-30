@@ -1,5 +1,6 @@
 package com.example.payment;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 
 
@@ -21,7 +22,7 @@ public class PaymentProcessor {
 
     public boolean processPayment(double amount) throws SQLException {
         // Anropar extern betaltjänst direkt med statisk API-nyckel
-        PaymentApiResponse response = paymentGateway.charge(amount);
+        PaymentApiResponse response = paymentGateway.charge(BigDecimal.valueOf(amount));
 
         // Skriver till databas direkt
         if (response.isSuccess()) {

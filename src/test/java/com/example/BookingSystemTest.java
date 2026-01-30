@@ -41,6 +41,8 @@ class BookingSystemTest {
     @BeforeEach
     public void setup(){
         bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
+        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+
     }
 
 
@@ -133,7 +135,52 @@ class BookingSystemTest {
         assertThat(room.hasBooking(booking.getId())).isFalse();
 
     }
+    /**
+     * Testar att systemet hanterar tidsintervallen korrekt✅.
+     * En bokning ska inte kunna accepteras om sluttiden är före eller samma som starttiden❌.
+     * * Given: Ett giltigt rums-id men ogiltiga tidsinställningar (slut före start).
+     * When: Metoden bookRoom anropas.
+     * Then: Ett IllegalArgumentException ska kastas för att förhindra felaktiga bokningar.
+     */
+    @ParameterizedTest(name = "Kör {index}: Start={0}, Slut={1} - ska kasta exception")
+    @CsvSource({"2026-01-20T10:00, 2026-01-20T09:00, false"})
+    @DisplayName("Slut ska inte vara före start")
+    void should_notwork_when_end_is_before_start() {
 
+        LocalDateTime start = LocalDateTime.parse("2026-01-20T10:00");
+        LocalDateTime end = LocalDateTime.parse("2026-01-20T09:00");
+
+        assertThatThrownBy(() -> bookingSystem.bookRoom("1", start, end))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Kan inte boka tid i dåtid");
+
+
+        assertThat(!end.isBefore(start)).isFalse();
+        verify(roomRepository, never()).save(any(Room.class));
+
+    }
+    @ParameterizedTest
+    @CsvSource({"'', 2026-01-20T10:00, 2026-01-20T11:00",
+            "'  ', 2026-01-20T10:00, 2026-01-20T11:00",
+            ", 2026-01-20T10:00, 2026-01-20T11:00"})
+    @DisplayName("Validera Ogiltliga rum-id")
+    void should_throwException_when_roomId_is_invalid(String roomIdFromCsv, String startStr, String endStr) {
+
+        LocalDateTime start = LocalDateTime.parse(startStr);
+        LocalDateTime end = LocalDateTime.parse(endStr);
+
+        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.of(2025, 1, 1, 0, 0));
+
+        when(roomRepository.findById(roomIdFromCsv)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookingSystem.bookRoom(roomIdFromCsv, start, end))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Rummet existerar inte");
+
+
+        verify(roomRepository, never()).save(any());
+
+    }
 
 
 
