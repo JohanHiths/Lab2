@@ -6,6 +6,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 
 import java.time.LocalDateTime;
@@ -19,10 +24,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Named.of;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 //
 
+@ExtendWith(MockitoExtension.class)
 class BookingSystemTest {
 
     private BookingSystem bookingSystem;
@@ -91,7 +96,6 @@ class BookingSystemTest {
         assertThat(result).isTrue();
         assertThat(room.isAvailable(start, end)).isTrue();
 
-
     }
     @Test
     @DisplayName("Ingen Dubbel Bokning")
@@ -107,7 +111,7 @@ class BookingSystemTest {
 
         assertThat(roomA.isAvailable(start, end)).isFalse();
     }
-//
+
     @Test
     @DisplayName("Ska kunna avboka")
     void cancelBooking() throws NotificationException {
@@ -129,6 +133,8 @@ class BookingSystemTest {
         assertThat(room.hasBooking(booking.getId())).isFalse();
 
     }
+
+
 
 
 

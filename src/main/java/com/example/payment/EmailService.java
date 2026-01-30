@@ -3,7 +3,7 @@ package com.example.payment;
 //
 public interface EmailService {
 
-    boolean sendPaymentConfirmation(String email, double amount);
+    void sendPaymentConfirmation(String email, double amount);
 
 
 }

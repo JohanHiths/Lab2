@@ -8,6 +8,7 @@ public class StripeGateway implements PaymentGateway{
     public PaymentApiResponse charge(double amount) {
 
         return charge(amount);
+
     }
 
 

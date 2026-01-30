@@ -1,9 +1,8 @@
 package com.example.payment;
 
 /// /
-public interface PaymentApiResponse {
+public record PaymentApiResponse(boolean success) {
 
-
-    boolean isSuccess();
 
 }
+
