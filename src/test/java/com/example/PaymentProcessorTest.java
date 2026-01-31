@@ -60,18 +60,17 @@ class PaymentProcessorTest {
     @ParameterizedTest
     @ValueSource(doubles = {1.0, 100.0, 999.99})
     void processPayment_success_savesAndSendsEmail(double amount) throws SQLException {
-         //Act
+
         boolean result = paymentProcessor.processPayment(amount);
 
-        // Assert
+
         Assertions.assertThat(result).isTrue();
 
-       // verify
+
         verify(paymentGateway).charge(BigDecimal.valueOf(amount));
         verify(paymentRepository).saveSuccessfulPayment(amount);
         verify(emailService).sendPaymentConfirmation("user@example.com", amount);
 
-        // extra
         verifyNoMoreInteractions(paymentGateway, paymentRepository, emailService);
     }
 
