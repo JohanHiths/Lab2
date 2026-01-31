@@ -75,7 +75,6 @@ class BookingSystemTest {
     @DisplayName("Ska inte kunna boka ett rum när det är otillgängligt")
     void shouldUnSuccessfullyBookARoomWhenItIsNotAvailable(){
         BookingSystem system = new BookingSystem(timeProvider, roomRepository, notificationService);
-
         LocalDateTime start = LocalDateTime.of(2026, 1, 20, 10, 0);
         LocalDateTime end = start.plusHours(2);
         String roomId = "Rum 1";
@@ -85,18 +84,16 @@ class BookingSystemTest {
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
         when(roomRepository.findAll()).thenReturn(List.of(room));
 
-        system.bookRoom(roomId, start, end);
+        boolean firstBookingResult = system.bookRoom(roomId, start, end);
+        assertThat(firstBookingResult).isTrue();
         verify(roomRepository).save(room);
 
-        assertThat(system.getAvailableRooms(start, end)).hasSize(1);
-
-        boolean result = system.bookRoom(roomId, start, end);
-
-        assertThat(result).isFalse();
+        boolean secondBookingResult = system.bookRoom(roomId, start, end);
+        assertThat(secondBookingResult).isFalse();
 
         assertThat(system.getAvailableRooms(start, end)).hasSize(0);
 
-        //verify(roomRepository, never()).save(any(Room.class));
+        verify(roomRepository, times(1)).save(room);
 
     }
 
@@ -114,14 +111,15 @@ class BookingSystemTest {
     @Test
     @DisplayName("Ska kunna boka tillgängliga rum")
     void getAvailableRooms() {
-        Room room = new Room("1", "Rum 1");
+        BookingSystem system = new BookingSystem(timeProvider, roomRepository, notificationService);
+        Room roomA = new Room("RoomA", "Rum 1");
+        Room roomB = new Room("RoomB", "Rum 2");
 
-        List<Room> rooms = new ArrayList<>();
+        roomA.addBooking(new Booking("1", "1", start, end));
 
-        boolean result = rooms.add(room);
+        when(roomRepository.findAll()).thenReturn(List.of(roomA, roomB));
 
-        assertThat(result).isTrue();
-        assertThat(room.isAvailable(start, end)).isTrue();
+        assertThat(system.getAvailableRooms(start, end).get(0).getId()).isEqualTo("RoomB");
 
     }
     @Test
@@ -132,19 +130,26 @@ class BookingSystemTest {
         LocalDateTime bookedSlot = LocalDateTime.of(2026, 1, 20, 10, 0);
         LocalDateTime bookedSlot2 = LocalDateTime.of(2026, 1, 20, 11, 0);
 
-
         roomA.addBooking(new Booking("1", "1", start, end));
         roomA.addBooking(new Booking("2", "1", start, end));
 
         assertThat(roomA.isAvailable(start, end)).isFalse();
     }
+    /**
+     * Testar att en existerande bokning kan avbokas korrekt.
+     *  Given: Ett rum har en registrerad bokning i framtiden.
+     * When: Metoden cancelBooking anropas med giltigt boknings-id.
+     * Then: - Metoden ska returnera true.
+     * - Bokningen ska tas bort från rummet.
+     * - Det uppdaterade rummet ska sparas i databasen.
+     * - En avbokningsbekräftelse ska skickas ut.
+     */
 
     @Test
-    @DisplayName("Ska kunna avboka")
+    @DisplayName("Ska kunna avboka en bokning i framtiden")
     void cancelBooking() throws NotificationException {
         LocalDateTime start = LocalDateTime.of(2026, 1, 20, 10, 0);
         LocalDateTime end = start.plusHours(1);
-
         Room room = new Room("1", "Rum 1");
         Booking booking = new Booking("B1", "1", start, end);
         String bookingId = "B1";
@@ -156,8 +161,11 @@ class BookingSystemTest {
         when(roomRepository.findAll()).thenReturn(List.of(room));
 
         boolean result = system.cancelBooking(bookingId);
+
         assertThat(result).isTrue();
         assertThat(room.hasBooking(booking.getId())).isFalse();
+        verify(roomRepository).save(room);
+        verify(notificationService).sendCancellationConfirmation(any());
 
     }
     /**
