@@ -1,12 +1,9 @@
 package com.example;
 
 import com.example.payment.*;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -14,74 +11,54 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentProcessorTest {
 
+    @Mock
+    private PaymentGateway paymentGateway;
+    @Mock
+    private PaymentRepository paymentRepository;
+    @Mock
+    private EmailService emailService;
+    @Mock
+    private PaymentApiResponse paymentApiResponse;
     @InjectMocks
-    PaymentProcessor paymentProcessor;
-    @Mock
-    EmailService emailService;
-    @Mock
-    PaymentGateway paymentGateway;
-    @Mock
-    PaymentRepository paymentRepository;
-
+    private PaymentProcessor paymentProcessor;
 
     @Test
-    @DisplayName("Kollar om betalningen lyckades")
-    void processSuccessfulPayment() throws SQLException {
+    @DisplayName("Ska gå vidare med betalning när betalningen lyckas")
+    void shouldProcessPaymentWhenGatewaySucceeds() throws SQLException {
+        double amount = 199.0;
 
-    }
-
-    @Test
-    @DisplayName("Kollar om betalningen misslyckades")
-    void processFailedPayment() throws SQLException {
-
-    }
-
-    @Test
-    @DisplayName("Tester EmailServie")
-    void processSuccessfulPaymentTest() throws SQLException {
-        PaymentGateway paymentGateway = mock(PaymentGateway.class);
-        EmailService emailService = mock(EmailService.class);
-
-        when(paymentGateway);
-
-        emailService.sendPaymentConfirmation("asdasd@hotmail.com", 100.0);
-
-
-        verify(emailService).sendPaymentConfirmation("asdasd@hotmail.com", 100.0);
-
-    }
-
-    @ParameterizedTest
-    @ValueSource(doubles = {1.0, 100.0, 999.99})
-    void processPayment_success_savesAndSendsEmail(double amount) throws SQLException {
+        when(paymentGateway.charge(BigDecimal.valueOf(amount))).thenReturn(paymentApiResponse);
+        when(paymentApiResponse.isSuccess()).thenReturn(true);
 
         boolean result = paymentProcessor.processPayment(amount);
 
-
-        Assertions.assertThat(result).isTrue();
-
-
-        verify(paymentGateway).charge(BigDecimal.valueOf(amount));
+        assertThat(result).isTrue();
         verify(paymentRepository).saveSuccessfulPayment(amount);
         verify(emailService).sendPaymentConfirmation("user@example.com", amount);
-
-        verifyNoMoreInteractions(paymentGateway, paymentRepository, emailService);
     }
 
-    @ParameterizedTest
-    @ValueSource(doubles = {-1.0, 0.0, })
-    void processPayment_fail_savesAndSendsEmail(double amount) {
+    @Test
+    @DisplayName("Ska inte gå vidare med betalning när betalningen misslyckas")
+    void shouldNotProcessPaymentWhenGatewayFails() throws SQLException {
+        double amount = 49.0;
 
+        when(paymentGateway.charge(BigDecimal.valueOf(amount))).thenReturn(paymentApiResponse);
+        when(paymentApiResponse.isSuccess()).thenReturn(false);
 
+        boolean result = paymentProcessor.processPayment(amount);
+
+        assertThat(result).isFalse();
+        verify(paymentRepository, never()).saveSuccessfulPayment((amount));
+        verify(emailService, never()).sendPaymentConfirmation("user@example.com", amount);
     }
-
-
 
 
 }
