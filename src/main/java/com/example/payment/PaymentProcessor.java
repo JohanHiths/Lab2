@@ -22,11 +22,13 @@ public class PaymentProcessor {
 
     public boolean processPayment(double amount, String customerEmail) throws SQLException {
         // Anropar extern betaltjänst direkt med statisk API-nyckel
-        PaymentApiResponse response = paymentGateway.charge(BigDecimal.valueOf(amount));
-
         if (customerEmail == null || customerEmail.isBlank()) {
             return false;
         }
+
+        PaymentApiResponse response = paymentGateway.charge(BigDecimal.valueOf(amount));
+
+
 
         // Skriver till databas direkt
         if (response.isSuccess()) {
