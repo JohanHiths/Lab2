@@ -32,7 +32,33 @@ public class ShoppingCartTest {
         cart.remove(item);
 
         assertThat(cart.size()).isEqualTo(0);
+    }
+    @Test
+    @DisplayName("Beräknar totala priset")
+    void calculateTotalPrice() {
+        ShoppingCart cart = new ShoppingCart();
 
+        assertThat(cart.total()).isEqualTo(0.0);
+    }
+    @Test
+    void cartTotalIsSumOfItemPrices_singleItem() {
+        ShoppingCart cart = new ShoppingCart();
+        Item item = new Item("Choklad", 10);
+
+        cart.add(item);
+
+        assertThat(cart.total()).isEqualTo(10);
+    }
+    @Test
+    void cartTotalIsSumOfItemPrices_multipleItems() {
+        ShoppingCart cart = new ShoppingCart();
+        Item item1 = new Item("Choklad", 10);
+        Item item2 = new Item("Kaffe", 5);
+
+        cart.add(item1);
+        cart.add(item2);
+
+        assertThat(cart.total()).isEqualTo(15);
     }
 
 }

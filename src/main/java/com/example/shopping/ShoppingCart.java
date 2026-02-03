@@ -6,7 +6,6 @@ import java.util.List;
 public class ShoppingCart {
     private final List<Item> items = new ArrayList<>();
 
-
     public void add(Item item) {
         items.add(item);
     }
@@ -18,4 +17,13 @@ public class ShoppingCart {
     public int size() {
         return items.size();
     }
+
+
+    public int total() {
+        return items.stream()
+                .mapToInt(Item::price)
+                .sum();
+    }
 }
+
+
