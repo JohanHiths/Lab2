@@ -27,7 +27,12 @@ public class ShoppingCart {
 
     public int smallSale() {
         return total() * 80 / 100;
-
+    }
+    public int mediumSale() {
+        return total() * 70 / 100;
+    }
+    public int largeSale() {
+        return total() * 50 / 100;
     }
 }
 

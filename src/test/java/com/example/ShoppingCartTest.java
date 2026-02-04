@@ -84,6 +84,29 @@ public class ShoppingCartTest {
         assertThat(cart.smallSale()).isEqualTo(12);
 
     }
+    @Test
+    void mediumSale_applies30PercentDiscount(){
+        ShoppingCart cart = new ShoppingCart();
+        Item item1 = new Item("Pizza", 100);
+        Item item2 = new Item("Cola", 20);
+
+        cart.add(item1);
+        cart.add(item2);
+
+        assertThat(cart.mediumSale()).isEqualTo(84);
+
+    }
+    @Test
+    void largeSale_applies50PercentDiscount(){
+        ShoppingCart cart = new ShoppingCart();
+        Item item1 = new Item("Car", 50000);
+        Item item2 = new Item("Bike", 10000);
+
+        cart.add(item1);
+        cart.add(item2);
+
+        assertThat(cart.largeSale()).isEqualTo(30000);
+    }
 
 
 
