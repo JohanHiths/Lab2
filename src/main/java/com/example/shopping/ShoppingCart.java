@@ -24,6 +24,11 @@ public class ShoppingCart {
                 .mapToInt(Item::price)
                 .sum();
     }
+
+    public int smallSale() {
+        return total() * 80 / 100;
+
+    }
 }
 
 

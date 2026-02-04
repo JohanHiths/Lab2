@@ -54,11 +54,39 @@ public class ShoppingCartTest {
         ShoppingCart cart = new ShoppingCart();
         Item item1 = new Item("Choklad", 10);
         Item item2 = new Item("Kaffe", 5);
+        Item item3 = new Item("Te", 3);
+
+
+
+        cart.add(item1);
+        cart.add(item2);
+        cart.add(item3);
+
+        assertThat(cart.total()).isEqualTo(18);
+
+    }
+
+    @Test
+    void smallSale_onEmptyCart_isZero() {
+        ShoppingCart cart = new ShoppingCart();
+
+        assertThat(cart.smallSale()).isEqualTo(0);
+    }
+    @Test
+    void smallSale_applies20PercentDiscount(){
+        ShoppingCart cart = new ShoppingCart();
+        Item item1 = new Item("Choklad", 10);
+        Item item2 = new Item("Kaffe", 5);
 
         cart.add(item1);
         cart.add(item2);
 
-        assertThat(cart.total()).isEqualTo(15);
+        assertThat(cart.smallSale()).isEqualTo(12);
+
     }
 
-}
+
+
+    }
+
+
