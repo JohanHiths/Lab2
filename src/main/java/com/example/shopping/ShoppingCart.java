@@ -24,15 +24,18 @@ public class ShoppingCart {
                 .mapToInt(Item::price)
                 .sum();
     }
+    private int discountedTotal(int percent) {
+        return total() * percent / 100;
+    }
 
     public int smallSale() {
-        return total() * 80 / 100;
+        return discountedTotal(80);
     }
     public int mediumSale() {
-        return total() * 70 / 100;
+        return discountedTotal(70);
     }
     public int largeSale() {
-        return total() * 50 / 100;
+        return discountedTotal(50);
     }
 }
 

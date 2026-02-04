@@ -19,8 +19,7 @@ public class ShoppingCartTest {
         item.add("Choklad");
 
 
-        assertThat(item.getName("Choklad")).isEqualTo("Choklad");
-
+        assertThat(item.getName()).isEqualTo("Choklad");
     }
     @Test
     @DisplayName("Ska kunna ta bort varor från kundvagnen")
