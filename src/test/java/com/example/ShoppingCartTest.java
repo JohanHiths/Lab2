@@ -71,6 +71,18 @@ public class ShoppingCartTest {
 
         assertThat(cart.smallSale()).isEqualTo(0);
     }
+
+    @Test
+    void mediumSale_onEmptyCart_isZero() {
+        ShoppingCart cart = new ShoppingCart();
+        assertThat(cart.mediumSale()).isEqualTo(0);
+    }
+
+    @Test
+    void largeSale_onEmptyCart_isZero() {
+        ShoppingCart cart = new ShoppingCart();
+        assertThat(cart.largeSale()).isEqualTo(0);
+    }
     @Test
     void smallSale_applies20PercentDiscount(){
         ShoppingCart cart = new ShoppingCart();
@@ -131,6 +143,79 @@ public class ShoppingCartTest {
         assertThat(cart.getQuantity(a)).isEqualTo(1);
         assertThat(cart.getQuantity(b)).isEqualTo(1);
     }
+
+    @Test
+    void totalCountsQuantity() {
+        ShoppingCart cart = new ShoppingCart();
+        Item choc = new Item("Choklad", 10);
+
+        cart.add(choc);
+        cart.add(choc);
+        cart.add(choc);
+
+        assertThat(cart.total()).isEqualTo(30);
+    }
+
+
+    @Test
+    void removingItemDecreasesQuantityByOne() {
+        ShoppingCart cart = new ShoppingCart();
+        Item choc = new Item("Choklad", 10);
+
+        cart.add(choc);
+        cart.add(choc);
+        cart.add(choc);
+
+        cart.remove(choc);
+
+        assertThat(cart.getQuantity(choc)).isEqualTo(2);
+    }
+    @Test
+    void removingLastItemRemovesItCompletely() {
+        ShoppingCart cart = new ShoppingCart();
+        Item choc = new Item("Choklad", 10);
+
+        cart.add(choc);
+        cart.remove(choc);
+
+        assertThat(cart.getQuantity(choc)).isEqualTo(0);
+    }
+    @Test
+    void removingItemUpdatesTotal() {
+        ShoppingCart cart = new ShoppingCart();
+        Item choc = new Item("Choklad", 10);
+
+        cart.add(choc);
+        cart.add(choc);
+
+        cart.remove(choc);
+
+        assertThat(cart.total()).isEqualTo(10);
+    }
+    @Test
+    void removingItemNotInCartDoesNothing() {
+        ShoppingCart cart = new ShoppingCart();
+        Item choc = new Item("Choklad", 10);
+
+        cart.remove(choc);
+
+        assertThat(cart.total()).isEqualTo(0);
+    }
+
+    @Test
+    void itemsWithSameNameButDifferentPriceAreTreatedAsDifferentItems() {
+        ShoppingCart cart = new ShoppingCart();
+        Item cheap = new Item("Choklad", 10);
+        Item expensive = new Item("Choklad", 20);
+
+        cart.add(cheap);
+        cart.add(expensive);
+
+        assertThat(cart.total()).isEqualTo(30);
+        assertThat(cart.getQuantity(cheap)).isEqualTo(1);
+        assertThat(cart.getQuantity(expensive)).isEqualTo(1);
+    }
+
 
 
 

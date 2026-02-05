@@ -2,9 +2,12 @@ package com.example.shopping;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 //
 public class ShoppingCart {
     private final List<Item> items = new ArrayList<>();
+
 
     public void add(Item item) {
         items.add(item);
@@ -28,7 +31,7 @@ public class ShoppingCart {
         return total() * percent / 100;
     }
 
-    public int smallSale() {
+    public int smallSale() { 
         return discountedTotal(80);
     }
     public int mediumSale() {
@@ -46,6 +49,11 @@ public class ShoppingCart {
             }
         }
         return quantity;
+    }
+
+    public int lineCount() {
+        return items.size();
+
     }
 }
 
