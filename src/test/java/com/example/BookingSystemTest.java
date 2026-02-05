@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Timer;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Named.of;
 import static org.mockito.Mockito.*;
 //
@@ -212,6 +214,47 @@ class BookingSystemTest {
         verify(roomRepository, never()).save(any());
 
     }
+
+    @Test
+    @DisplayName("Ska kasta exception om sluttid är före starttid")
+    void shouldThrowExceptionWhenEndTimeIsBeforeStartTime() {
+        LocalDateTime start = LocalDateTime.now().plusHours(2);
+        LocalDateTime end = LocalDateTime.now().plusHours(1);
+        assertThrows(IllegalArgumentException.class, () -> {
+            bookingSystem.getAvailableRooms(start, end);
+        });
+    }
+
+    @Test
+    @DisplayName("Booking id kan inte vara null")
+    void shouldThrowExceptionWhenBookingIdIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            bookingSystem.cancelBooking(null);
+        });
+    }
+    @Test
+    @DisplayName("Ska kunna göra en avbokning ")
+    void should_successfully_cancel_booking() throws NotificationException {
+        LocalDateTime bookingStart = LocalDateTime.of(2026, 1, 20, 10, 0);
+        LocalDateTime bookingEnd = bookingStart.plusHours(1);
+        LocalDateTime currentTime = bookingStart.plusMinutes(30);
+
+        Room room = new Room("1", "Rum 1");
+        Booking booking = new Booking("B1", "1", bookingStart, bookingEnd);
+        room.addBooking(booking);
+
+        when(roomRepository.findAll()).thenReturn(List.of(room));
+        when(timeProvider.getCurrentTime()).thenReturn(currentTime);
+
+        BookingSystem system = new BookingSystem(timeProvider, roomRepository, notificationService);
+
+
+        assertThatThrownBy(() -> system.cancelBooking("B1"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Kan inte avboka påbörjad eller avslutad bokning");
+
+    }
+
 
 
 
