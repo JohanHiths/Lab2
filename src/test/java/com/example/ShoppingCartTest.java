@@ -37,7 +37,7 @@ public class ShoppingCartTest {
     void calculateTotalPrice() {
         ShoppingCart cart = new ShoppingCart();
 
-        assertThat(cart.total()).isEqualTo(0.0);
+        assertThat(cart.total()).isEqualTo(0);
     }
     @Test
     void cartTotalIsSumOfItemPrices_singleItem() {
@@ -105,6 +105,31 @@ public class ShoppingCartTest {
         cart.add(item2);
 
         assertThat(cart.largeSale()).isEqualTo(30000);
+    }
+
+    @Test
+    void addingSameItemTwiceIncreasesQuantity() {
+        ShoppingCart cart = new ShoppingCart();
+        Item item = new Item("Choklad", 10);
+
+        cart.add(item);
+        cart.add(item);
+
+        assertThat(cart.getQuantity(item)).isEqualTo(2);
+    }
+
+    @Test
+    void addingDifferentItemsDoesNotMergeQuantity() {
+        ShoppingCart cart = new ShoppingCart();
+
+        Item a = new Item("Choklad", 10);
+        Item b = new Item("Kaffe", 10);
+
+        cart.add(a);
+        cart.add(b);
+
+        assertThat(cart.getQuantity(a)).isEqualTo(1);
+        assertThat(cart.getQuantity(b)).isEqualTo(1);
     }
 
 

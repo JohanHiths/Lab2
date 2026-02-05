@@ -37,6 +37,16 @@ public class ShoppingCart {
     public int largeSale() {
         return discountedTotal(50);
     }
+
+    public int getQuantity(Item item) {
+        int quantity = 0;
+        for (Item i : items) {
+            if (i.equals(item)) {
+                quantity++;
+            }
+        }
+        return quantity;
+    }
 }
 
 
