@@ -6,7 +6,7 @@ så jag skapade PaymentGateway och flyttade API-anropet till StripeGateway
 
 nu kan PaymentProcessor kan unit-testas genom att mocka PaymentGateway
 
-
+//
 Extraherade e-post till EmailService
 
 statiskt EmailService.send ger sidoeffekter i tester och är svårt att mocka
