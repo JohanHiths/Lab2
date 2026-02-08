@@ -22,22 +22,22 @@ public class ShoppingCart {
     }
 
 
-    public int total() {
+    public double total() {
         return items.stream()
                 .mapToInt(Item::price)
                 .sum();
     }
-    private int discountedTotal(int percent) {
-        return total() * percent / 100;
+    private double discountedTotal(int percent) {
+        return (double) (total() * percent) / 100;
     }
 
-    public int smallSale() { 
+    public double smallSale() {
         return discountedTotal(80);
     }
-    public int mediumSale() {
+    public double mediumSale() {
         return discountedTotal(70);
     }
-    public int largeSale() {
+    public double largeSale() {
         return discountedTotal(50);
     }
 
@@ -55,6 +55,8 @@ public class ShoppingCart {
         return items.size();
 
     }
+
+
 }
 
 
