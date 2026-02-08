@@ -17,8 +17,6 @@ public class Item {
         this.price = price;
     }
 
-
-
     public void add(String name) {
         this.name = name;
     }
